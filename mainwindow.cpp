@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(&dialog1,&Dialog1::showmainwindow,this,&MainWindow::show);//收到来自Dialog1的showmainwindow信号后，执行后面的MainWindow::show
 }
 
 MainWindow::~MainWindow()
@@ -14,16 +16,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_linkbutton_clicked()
+
+
+void MainWindow::on_linkButton_clicked()
 {
-    QMessageBox::information(this,"图形界面",ui->ipline->text());
     this->hide();
     dialog1.show();
-    dialog1.exec();
-    this->show();
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_exitButton_clicked()
 {
     this->close();
 }

@@ -26,12 +26,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    dialog1.cpp
+    dialog1.cpp \
+    dialogdownload.cpp \
+    dialogupload.cpp
 
 HEADERS += \
         mainwindow.h \
-    dialog1.h
+    dialog1.h \
+    dialogdownload.h \
+    dialogupload.h
 
 FORMS += \
         mainwindow.ui \
-    dialog1.ui
+    dialog1.ui \
+    dialogdownload.ui \
+    dialogupload.ui

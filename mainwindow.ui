@@ -27,7 +27,7 @@
      <string>在此输入ftp连接ip地址</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="linkbutton">
+   <widget class="QPushButton" name="linkButton">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -40,7 +40,7 @@
      <string>连接</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="exitButton">
     <property name="geometry">
      <rect>
       <x>480</x>
