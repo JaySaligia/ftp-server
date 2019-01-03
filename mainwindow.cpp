@@ -20,8 +20,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_linkButton_clicked()
 {
+    client newclinet;
+    newclinet.ipaddr = ui->ipline->text().toStdString();
+    if (!newclinet.linkstart())
+        QMessageBox::information(this,"连接信息","Fail to link to servicer");
+    else{
+    QMessageBox::information(this,"连接信息","Success to link to servicer");
     this->hide();
     dialog1.show();
+    }
 }
 
 void MainWindow::on_exitButton_clicked()

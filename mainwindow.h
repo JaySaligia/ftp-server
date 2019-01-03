@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "dialog1.h"
+#include "client.h"
 
 namespace Ui {
 class MainWindow;

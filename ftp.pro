@@ -28,13 +28,15 @@ SOURCES += \
         mainwindow.cpp \
     dialog1.cpp \
     dialogdownload.cpp \
-    dialogupload.cpp
+    dialogupload.cpp \
+    client.cpp
 
 HEADERS += \
         mainwindow.h \
     dialog1.h \
     dialogdownload.h \
-    dialogupload.h
+    dialogupload.h \
+    client.h
 
 FORMS += \
         mainwindow.ui \
