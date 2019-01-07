@@ -1,12 +1,14 @@
 #include "dialogupload.h"
 #include "ui_dialogupload.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 Dialogupload::Dialogupload(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialogupload)
 {
     ui->setupUi(this);
+    ui->csfileLine->setFocusPolicy(Qt::NoFocus);
 }
 
 Dialogupload::~Dialogupload()
@@ -23,5 +25,15 @@ void Dialogupload::on_backButton_clicked()
 void Dialogupload::on_csfileButton_clicked()
 {
     openFile = QFileDialog::getOpenFileName(this, "打开", "c:\\", "*");
+    ui->csfileLine->setText(openFile);
+}
+
+void Dialogupload::shownofilemsg()
+{
+    QMessageBox::information(this,"错误信息","未选中任何文件或文件不存在");
+}
+
+void Dialogupload::on_uploadstartButton_clicked()
+{
     emit getfilename();
 }

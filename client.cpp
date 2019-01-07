@@ -6,6 +6,8 @@ client::client()
 }
 int client::linkstart(){
     //return 1;
+    char sendbuf[BUFSIZE];//发送缓冲区
+    char revbuf[BUFSIZE];//接受缓冲区
     int retval;//返回状态
     int serverlen;//套接字长度
     if (WSAStartup(MAKEWORD(2,2), &wsa) != 0){
@@ -42,7 +44,7 @@ int client::linkstart(){
         recv(hostsoc, revbuf, sizeof(revbuf), 0);//331
         for (int i = 0; i< 3; i++)
             retval_name += revbuf[i];
-        cout<<retval_name<<endl;
+        //cout<<retval_name<<endl;
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
@@ -52,7 +54,7 @@ int client::linkstart(){
         recv(hostsoc, revbuf, sizeof(revbuf), 0);//230
         for (int i = 0; i< 3; i++)
             retval_pw += revbuf[i];
-        cout<<retval_pw<<endl;
+        //cout<<retval_pw<<endl;
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
@@ -69,7 +71,44 @@ int client::linkstart(){
 
 }
 
-int client::download(){
-  return 1;
+
+
+int client::upload(const char *openfile){
+    char sendbuf[BUFSIZE];
+    char recvbuf[BUFSIZE];
+
+    FILE * f;
+    f = fopen(openfile, "rb");
+    if (NULL == f)
+    return -1;//文件不存在
+
+    if(!this->pasvstart())
+        return -2;//被动模式开启失败
+    else{
+        closesocket(hostsocpasv);
+    }
+
+
+    return 1;
+}
+
+int client::pasvstart(){//开启pasv套接字
+    char sendbuf[BUFSIZE];
+    char recvbuf[BUFSIZE];
+    char buf[BUFSIZE];
+    int addr[6];
+    int retval;
+    string retval_msg = "";
+
+    ZeroMemory(sendbuf, BUFSIZE);
+    sprintf(sendbuf, "PASV\r\n");
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+
+    sscanf(recvbuf, "%*[^(](%d,%d,%d,%d,%d,%d)",&addr[0],&addr[1],&addr[2],&addr[3],&addr[4],&addr[5]);
+
+    for (int i = 0; i < 6 ; i++)
+    cout<<addr[i]<<endl;
+    return 1;
 }
 

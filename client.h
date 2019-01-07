@@ -19,12 +19,12 @@ public:
     string pw;//登陆密码
     WSADATA wsa;//wsadata
     SOCKET hostsoc;//服务器套接字
+    SOCKET hostsocpasv;//服务器套接字，pasv模式
     SOCKADDR_IN serveraddr;//服务器地址
     CONST int BUFSIZE = 64;
-    char sendbuf[64];//发送缓冲区
-    char revbuf[64];//接受缓冲区
     int linkstart();//连接服务器
-    int download();
+    int upload(const char *openfile);
+    int pasvstart();
 };
 
 #endif // CLIENT_H

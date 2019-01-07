@@ -16,7 +16,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+signals:
+    void shownofile();//显示文件不存在错误
 private slots:
 
     void on_linkButton_clicked();

@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pwline->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     connect(&dialog1,&Dialog1::showmainwindow,this,&MainWindow::show);//收到来自Dialog1的showmainwindow信号后，执行后面的MainWindow::show
     connect(&dialog1.dialogupload,&Dialogupload::getfilename,this,&MainWindow::upload);//收到来自dialogupload的getfilename信号后，执行upload
+    connect(this, &MainWindow::shownofile, &dialog1.dialogupload, &Dialogupload::shownofilemsg);//给dialogupload发送不存在该文件的信号
 }
 
 MainWindow::~MainWindow()
@@ -47,5 +48,11 @@ void MainWindow::on_exitButton_clicked()
 
 void MainWindow::upload()//上传文件
 {
-    cout<<dialog1.dialogupload.openFile.toStdString()<<endl;
+    //const char openfile;
+    const char* openfile = dialog1.dialogupload.openFile.toStdString().c_str();
+    //cout<<dialog1.dialogupload.openFile.toStdString()<<endl;
+    switch(newclinet.upload(openfile)){
+    case -1:emit shownofile();
+    case -2:cout<<"dasdas"<<endl;
+}
 }
