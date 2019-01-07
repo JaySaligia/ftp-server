@@ -5,6 +5,7 @@ client::client()
 
 }
 int client::linkstart(){
+    //return 1;
     int retval;//返回状态
     int serverlen;//套接字长度
     if (WSAStartup(MAKEWORD(2,2), &wsa) != 0){
@@ -29,8 +30,8 @@ int client::linkstart(){
         return 0;
     }
     else{//验证用户名和密码
-        int retval_name;
-        int retval_pw;
+        string retval_name = "";
+        string retval_pw = "";
         recv(hostsoc, revbuf, sizeof(revbuf), 0);
         //cout<<revbuf<<endl;//220 信息
         ZeroMemory(revbuf, BUFSIZE);
@@ -38,20 +39,24 @@ int client::linkstart(){
         sprintf(sendbuf, "USER %s\r\n", name.c_str());
         //cout<<sendbuf<<endl;
         send(hostsoc, sendbuf, strlen(sendbuf), 0);//不能用sizeof()，要用strlen()
-        retval_name = recv(hostsoc, revbuf, sizeof(revbuf), 0);//34
-        //cout<<retval_name<<endl;
+        recv(hostsoc, revbuf, sizeof(revbuf), 0);//331
+        for (int i = 0; i< 3; i++)
+            retval_name += revbuf[i];
+        cout<<retval_name<<endl;
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
         sprintf(sendbuf, "PASS %s\r\n", pw.c_str());
         //cout<<sendbuf<<endl;
         send(hostsoc, sendbuf, strlen(sendbuf), 0);
-        retval_pw = recv(hostsoc, revbuf, sizeof(revbuf), 0);//23
-        //cout<<retval_pw<<endl;
+        recv(hostsoc, revbuf, sizeof(revbuf), 0);//230
+        for (int i = 0; i< 3; i++)
+            retval_pw += revbuf[i];
+        cout<<retval_pw<<endl;
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
-        if(retval_name == 34 && retval_pw == 23){
+        if(retval_name == "331" && retval_pw == "230"){
             closesocket(hostsoc);
             WSACleanup();
             return 1;
@@ -65,6 +70,6 @@ int client::linkstart(){
 }
 
 int client::download(){
-
+  return 1;
 }
 

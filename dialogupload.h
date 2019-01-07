@@ -14,12 +14,16 @@ class Dialogupload : public QDialog
 public:
     explicit Dialogupload(QWidget *parent = 0);
     ~Dialogupload();
+    QString openFile = "";
 
 signals:
     void showdialog1up();
+    void getfilename();
 
 private slots:
     void on_backButton_clicked();
+
+    void on_csfileButton_clicked();
 
 private:
     Ui::Dialogupload *ui;

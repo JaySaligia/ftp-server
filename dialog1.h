@@ -17,6 +17,9 @@ class Dialog1 : public QDialog
 public:
     explicit Dialog1(QWidget *parent = 0);
     ~Dialog1();
+    Dialogdownload dialogdownload;
+    Dialogupload dialogupload;
+
 signals:
     void showmainwindow();
 
@@ -29,8 +32,7 @@ private slots:
 
 private:
     Ui::Dialog1 *ui;
-    Dialogdownload dialogdownload;
-    Dialogupload dialogupload;
+
 };
 
 #endif // DIALOG1_H

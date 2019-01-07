@@ -3,6 +3,7 @@
 #include "winsock2.h"
 #include <iostream>
 #include "string.h"
+#include "dialogupload.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ public:
     char sendbuf[64];//发送缓冲区
     char revbuf[64];//接受缓冲区
     int linkstart();//连接服务器
+    int download();
 };
 
 #endif // CLIENT_H

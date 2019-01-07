@@ -23,9 +23,11 @@ private slots:
 
     void on_exitButton_clicked();
 
+    void upload();
 private:
     Ui::MainWindow *ui;
     Dialog1 dialog1;
+    client newclinet;
 };
 
 #endif // MAINWINDOW_H

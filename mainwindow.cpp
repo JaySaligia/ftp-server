@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->pwline->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     connect(&dialog1,&Dialog1::showmainwindow,this,&MainWindow::show);//收到来自Dialog1的showmainwindow信号后，执行后面的MainWindow::show
+    connect(&dialog1.dialogupload,&Dialogupload::getfilename,this,&MainWindow::upload);//收到来自dialogupload的getfilename信号后，执行upload
 }
 
 MainWindow::~MainWindow()
@@ -20,7 +21,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_linkButton_clicked()
 {
-    client newclinet;
     newclinet.ipaddr = ui->ipline->text().toStdString();
     newclinet.name = ui->nameline->text().toStdString();
     newclinet.pw = ui->pwline->text().toStdString();
@@ -43,4 +43,9 @@ void MainWindow::on_linkButton_clicked()
 void MainWindow::on_exitButton_clicked()
 {
     this->close();
+}
+
+void MainWindow::upload()//上传文件
+{
+    cout<<dialog1.dialogupload.openFile.toStdString()<<endl;
 }
