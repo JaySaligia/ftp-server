@@ -59,8 +59,8 @@ int client::linkstart(){
         ZeroMemory(revbuf, BUFSIZE);
 
         if(retval_name == "331" && retval_pw == "230"){
-            closesocket(hostsoc);
-            WSACleanup();
+            //closesocket(hostsoc);
+            //WSACleanup();
             return 1;
         }
         else return -3;//用户名密码错误
@@ -76,20 +76,54 @@ int client::linkstart(){
 int client::upload(const char *openfile){
     char sendbuf[BUFSIZE];
     char recvbuf[BUFSIZE];
-
+    char databuf[BUFSIZE];
+    ssize_t len, send_len;
+    int result;
     FILE * f;
     f = fopen(openfile, "rb");
     if (NULL == f)
     return -1;//文件不存在
 
+
     if(!this->pasvstart())
         return -2;//被动模式开启失败
-    else{
-        closesocket(hostsocpasv);
+
+    ZeroMemory(sendbuf, BUFSIZE);
+    sprintf(sendbuf, "STOR %s\r\n", "poker.txt");
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    ZeroMemory(databuf, BUFSIZE);
+    while ((len = fread(databuf, 1, BUFSIZE, f)) > 0)
+    {
+        cout<<databuf<<endl;
+        send_len = send(hostsocpasv, databuf, len, 0);
+        if(send_len != len)
+        {
+            closesocket(hostsocpasv);
+            fclose(f);
+            return -3;//发送文件失败
+        }
+
     }
+    closesocket(hostsocpasv);
+    fclose(f);
+    ZeroMemory(recvbuf, BUFSIZE);
+    len = recv(hostsoc, recvbuf, BUFSIZE, 0);
+    cout<<recvbuf<<endl;
+    recvbuf[len] = 0;
+    sscanf(recvbuf, "%d", &result);
+    if(result == 150)
+    {
+        closesocket(hostsoc);
+        WSACleanup();
+        return 1;
+    }
+    return -3;
 
 
-    return 1;
+
+    //closesocket(hostsocpasv);
+    //closesocket(hostsoc);
+    //WSACleanup();
 }
 
 int client::pasvstart(){//开启pasv套接字
@@ -98,17 +132,23 @@ int client::pasvstart(){//开启pasv套接字
     char buf[BUFSIZE];
     int addr[6];
     int retval;
+    int serverlen;
     string retval_msg = "";
 
     ZeroMemory(sendbuf, BUFSIZE);
     sprintf(sendbuf, "PASV\r\n");
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
-
     sscanf(recvbuf, "%*[^(](%d,%d,%d,%d,%d,%d)",&addr[0],&addr[1],&addr[2],&addr[3],&addr[4],&addr[5]);
 
-    for (int i = 0; i < 6 ; i++)
-    cout<<addr[i]<<endl;
+    hostsocpasv = socket(AF_INET,SOCK_STREAM, 0);
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_addr.s_addr = inet_addr(ipaddr.c_str());
+    serveraddr.sin_port = htons((short)addr[4]*256+addr[5]);
+    serverlen = sizeof(serveraddr);
+    retval = connect(hostsocpasv, (LPSOCKADDR)&serveraddr, serverlen);
+    if (retval == SOCKET_ERROR)
+        return 0;
     return 1;
 }
 

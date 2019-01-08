@@ -18,6 +18,9 @@ public:
     ~MainWindow();
 signals:
     void shownofile();//显示文件不存在错误
+    void showpasvfailed();//显示被动模式开启错误
+    void showuploadsuccess();//显示上传成功
+
 private slots:
 
     void on_linkButton_clicked();

@@ -33,6 +33,16 @@ void Dialogupload::shownofilemsg()
     QMessageBox::information(this,"错误信息","未选中任何文件或文件不存在");
 }
 
+void Dialogupload::showpasvfailedmsg()
+{
+    QMessageBox::information(this,"错误信息","被动连接开启失败");
+}
+
+void Dialogupload::showuploadsuccessmsg()
+{
+    QMessageBox::information(this,"信息","文件上传成功");
+}
+
 void Dialogupload::on_uploadstartButton_clicked()
 {
     emit getfilename();

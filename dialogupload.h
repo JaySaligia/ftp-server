@@ -16,9 +16,13 @@ public:
     ~Dialogupload();
     QString openFile = "";
     void shownofilemsg();
+    void showpasvfailedmsg();
+    void showuploadsuccessmsg();
+
 signals:
     void showdialog1up();
     void getfilename();
+
 
 private slots:
     void on_backButton_clicked();
