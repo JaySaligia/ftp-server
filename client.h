@@ -19,13 +19,16 @@ public:
     string pw;//登陆密码
     WSADATA wsa;//wsadata
     SOCKET hostsoc;//服务器套接字
-    SOCKET hostsocpasv;//服务器套接字，pasv模式
+    //SOCKET hostsocpasv;//服务器套接字，pasv模式
     SOCKADDR_IN serveraddr;//服务器地址
     CONST int BUFSIZE = 64;
     int linkstart();//连接服务器
-    int upload(const char *openfile);
-    int pasvstart();
-    void finish();
+    int upload(const char *openfile);//上传文件
+    SOCKET pasvstart();//开启被动连接
+    void finish();//结束套接字
+    int download(const char *storedir, const char *downloadfile);//下载文件
+    int flag_up = 0;
+    int flag_down = 0;
 };
 
 #endif // CLIENT_H

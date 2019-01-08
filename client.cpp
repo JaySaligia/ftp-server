@@ -96,10 +96,9 @@ int client::upload(const char *openfile){
             filename = p;
             p=strtok(NULL,d);
         }
-    //cout<<filename<<endl;
-
-    if(!this->pasvstart())
-        return -2;//被动模式开启失败
+    SOCKET hostsocpasv = pasvstart();
+    //if(!this->pasvstart())
+      //  return -2;//被动模式开启失败
 
     ZeroMemory(sendbuf, BUFSIZE);
     sprintf(sendbuf, "STOR %s\r\n", filename);
@@ -107,7 +106,6 @@ int client::upload(const char *openfile){
     ZeroMemory(databuf, BUFSIZE);
     while ((len = fread(databuf, 1, BUFSIZE, f)) > 0)
     {
-        //cout<<databuf<<endl;
         send_len = send(hostsocpasv, databuf, len, 0);
         if(send_len != len)
         {
@@ -121,19 +119,76 @@ int client::upload(const char *openfile){
     fclose(f);
     ZeroMemory(recvbuf, BUFSIZE);
     len = recv(hostsoc, recvbuf, BUFSIZE, 0);
-    //cout<<recvbuf<<endl;
     recvbuf[len] = 0;
     sscanf(recvbuf, "%d", &result);
     if(result == 150)
     {
-        closesocket(hostsoc);
         return 1;//上传成功
     }
     return -3;
-
 }
 
-int client::pasvstart(){//开启pasv套接字
+int client::download(const char *storedir,const char *downloadfile){//下载文件，第一个参数是本地保存文件夹路径，第二个参数是需要下载的服务器文件名称
+    ssize_t len, write_len;
+    char sendbuf[BUFSIZE];
+    char recvbuf[BUFSIZE];
+    char databuf[BUFSIZE];
+    int result;
+    if (!strlen(storedir))
+        return -1;//本地目录不存在
+    if (!strlen(downloadfile))
+        return -2;//未指定下载文件
+    string a = storedir;
+    string b = downloadfile;
+    string c = a + "/" + b;
+    const char *filename = c.c_str();
+
+    FILE *f = fopen(filename, "wb");
+    if(f == NULL)
+    {
+        return -1;
+    }
+
+    sprintf(sendbuf, "TYPE I\r\n");
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    //cout<<recvbuf<<endl;
+    SOCKET hostsocpasv = pasvstart();
+
+        //return -3;//被动模式开启失败
+
+
+    ZeroMemory(sendbuf, sizeof(sendbuf));
+    ZeroMemory(recvbuf, sizeof(recvbuf));
+    sprintf(sendbuf, "RETR %s\r\n", downloadfile);
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    recvbuf[len] = 0;
+    sscanf(recvbuf, "%d", &result);
+
+
+    ZeroMemory(databuf, sizeof(databuf));
+    while ((len = recv(hostsocpasv, databuf, BUFSIZE, 0)) > 0) {
+            write_len = fwrite(&databuf, len, 1, f);
+            if (write_len != 1) //写入文件不完整
+            {
+                closesocket(hostsocpasv); //关闭套接字
+                fclose(f); //关闭文件
+                return -1;
+            }
+        }
+
+    fclose(f);
+    closesocket(hostsocpasv);
+    if(result == 150)
+    {
+        return 1;
+    }
+    return -4;
+}
+
+SOCKET client::pasvstart(){//开启pasv套接字
+    SOCKET hostsocpasv;
     char sendbuf[BUFSIZE];
     char recvbuf[BUFSIZE];
     int addr[6];
@@ -146,7 +201,7 @@ int client::pasvstart(){//开启pasv套接字
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
     sscanf(recvbuf, "%*[^(](%d,%d,%d,%d,%d,%d)",&addr[0],&addr[1],&addr[2],&addr[3],&addr[4],&addr[5]);
-
+    //新建一个pasv套接字
     hostsocpasv = socket(AF_INET,SOCK_STREAM, 0);
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = inet_addr(ipaddr.c_str());
@@ -155,7 +210,7 @@ int client::pasvstart(){//开启pasv套接字
     retval = connect(hostsocpasv, (LPSOCKADDR)&serveraddr, serverlen);
     if (retval == SOCKET_ERROR)
         return 0;
-    return 1;
+    return hostsocpasv;
 }
 
 void client::finish(){

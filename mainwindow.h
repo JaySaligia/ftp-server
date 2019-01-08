@@ -21,6 +21,10 @@ signals:
     void showpasvfailed();//显示被动模式开启错误
     void showuploadsuccess();//显示上传成功
 
+    void shownodir();//显示目录存在
+    void shownodownloadfile();//显示未指定下载文件
+    void showdownloadsuccess();//显示下载成功
+
 private slots:
 
     void on_linkButton_clicked();
@@ -29,6 +33,7 @@ private slots:
 
     void upload();
 
+    void download();
     void finishlink();
 private:
     Ui::MainWindow *ui;

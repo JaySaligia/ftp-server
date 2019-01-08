@@ -13,6 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::shownofile, &dialog1.dialogupload, &Dialogupload::shownofilemsg);//给dialogupload发送不存在该文件的信号
     connect(this, &MainWindow::showpasvfailed, &dialog1.dialogupload, &Dialogupload::showpasvfailedmsg);//发送开启被动模式失败的信号
     connect(this, &MainWindow::showuploadsuccess, &dialog1.dialogupload, &Dialogupload::showuploadsuccessmsg);//发送文件上传成功的信号
+
+    connect(&dialog1.dialogdownload,&Dialogdownload::getdownloadmsg, this, &MainWindow::download);
+    connect(this, &MainWindow::shownodir, &dialog1.dialogdownload, &Dialogdownload::shownodirmsg);
+    connect(this, &MainWindow::shownodownloadfile, &dialog1.dialogdownload, &Dialogdownload::shownodownloadfilemsg);
+    connect(this, &MainWindow::showpasvfailed, &dialog1.dialogdownload, &Dialogdownload::showpasvfailedmsg);
+    connect(this, &MainWindow::showdownloadsuccess, &dialog1.dialogdownload, &Dialogdownload::showdownloadsuccessmsg);
 }
 
 MainWindow::~MainWindow()
@@ -50,13 +56,23 @@ void MainWindow::on_exitButton_clicked()
 
 void MainWindow::upload()//上传文件
 {
-    //const char openfile;
     const char* openfile = dialog1.dialogupload.openFile.toStdString().c_str();
-    //cout<<dialog1.dialogupload.openFile.toStdString()<<endl;
     switch(newclinet.upload(openfile)){
     case -1:emit shownofile();break;
     case -2:emit showpasvfailed();break;
     case 1:emit showuploadsuccess();break;
+    }
+}
+
+void MainWindow::download()//下载文件
+{
+    const char *storedir = dialog1.dialogdownload.storeDir.toStdString().c_str();
+    const char *downloadfile = dialog1.dialogdownload.downloadFile.toStdString().c_str();
+    switch(newclinet.download(storedir, downloadfile)){
+    case -1:emit shownodir();break;
+    case -2:emit shownodownloadfile();break;
+    case -3:emit showpasvfailed();break;
+    case 1:emit showdownloadsuccess();break;
     }
 }
 

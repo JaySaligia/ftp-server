@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>430</y>
+     <x>70</x>
+     <y>410</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -43,6 +43,68 @@
    </property>
    <property name="text">
     <string>下载页面</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="stfileButton">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>110</y>
+     <width>141</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>选择文件保存路径</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="stfileLine">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>110</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>你所选择的目录</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>160</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>输入下载文件名称</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="downloadfileLine">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>160</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadstartButton">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>220</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>开始下载</string>
    </property>
   </widget>
  </widget>
