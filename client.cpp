@@ -143,20 +143,13 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
     string c = a + "/" + b;
     const char *filename = c.c_str();
 
-    FILE *f = fopen(filename, "wb");
-    if(f == NULL)
-    {
-        return -1;
-    }
+
 
     sprintf(sendbuf, "TYPE I\r\n");
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
-    //cout<<recvbuf<<endl;
+
     SOCKET hostsocpasv = pasvstart();
-
-        //return -3;//被动模式开启失败
-
 
     ZeroMemory(sendbuf, sizeof(sendbuf));
     ZeroMemory(recvbuf, sizeof(recvbuf));
@@ -165,8 +158,13 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
     len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
     recvbuf[len] = 0;
     sscanf(recvbuf, "%d", &result);
-
-
+    if(result != 150)
+        return -2;//文件不存在
+    FILE *f = fopen(filename, "wb");
+    if(f == NULL)
+    {
+        return -1;
+    }
     ZeroMemory(databuf, sizeof(databuf));
     while ((len = recv(hostsocpasv, databuf, BUFSIZE, 0)) > 0) {
             write_len = fwrite(&databuf, len, 1, f);
@@ -180,11 +178,7 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
 
     fclose(f);
     closesocket(hostsocpasv);
-    if(result == 150)
-    {
-        return 1;
-    }
-    return -4;
+    return 1;
 }
 
 SOCKET client::pasvstart(){//开启pasv套接字
@@ -194,12 +188,19 @@ SOCKET client::pasvstart(){//开启pasv套接字
     int addr[6];
     int retval;
     int serverlen;
-    string retval_msg = "";
+    int result = 0;
+    ssize_t len;
+
 
     ZeroMemory(sendbuf, BUFSIZE);
     sprintf(sendbuf, "PASV\r\n");
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
-    recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    while (result != 227){
+    ZeroMemory(recvbuf, sizeof(recvbuf));
+    len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    recvbuf[len] = 0;
+    sscanf(recvbuf, "%d", &result);
+    }
     sscanf(recvbuf, "%*[^(](%d,%d,%d,%d,%d,%d)",&addr[0],&addr[1],&addr[2],&addr[3],&addr[4],&addr[5]);
     //新建一个pasv套接字
     hostsocpasv = socket(AF_INET,SOCK_STREAM, 0);
