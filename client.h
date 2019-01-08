@@ -25,6 +25,7 @@ public:
     int linkstart();//连接服务器
     int upload(const char *openfile);
     int pasvstart();
+    void finish();
 };
 
 #endif // CLIENT_H

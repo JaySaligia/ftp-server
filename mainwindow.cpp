@@ -8,11 +8,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->pwline->setEchoMode(QLineEdit::PasswordEchoOnEdit);
-    connect(&dialog1,&Dialog1::showmainwindow,this,&MainWindow::show);//收到来自Dialog1的showmainwindow信号后，执行后面的MainWindow::show
+    connect(&dialog1,&Dialog1::showmainwindow,this,&MainWindow::finishlink);//收到来自Dialog1的showmainwindow信号后，执行后面的MainWindow::finishlink
     connect(&dialog1.dialogupload,&Dialogupload::getfilename,this,&MainWindow::upload);//收到来自dialogupload的getfilename信号后，执行upload
     connect(this, &MainWindow::shownofile, &dialog1.dialogupload, &Dialogupload::shownofilemsg);//给dialogupload发送不存在该文件的信号
-    connect(this, &MainWindow::showpasvfailed, &dialog1.dialogupload, &Dialogupload::showpasvfailedmsg);
-    connect(this, &MainWindow::showuploadsuccess, &dialog1.dialogupload, &Dialogupload::showuploadsuccessmsg);
+    connect(this, &MainWindow::showpasvfailed, &dialog1.dialogupload, &Dialogupload::showpasvfailedmsg);//发送开启被动模式失败的信号
+    connect(this, &MainWindow::showuploadsuccess, &dialog1.dialogupload, &Dialogupload::showuploadsuccessmsg);//发送文件上传成功的信号
 }
 
 MainWindow::~MainWindow()
@@ -57,5 +57,11 @@ void MainWindow::upload()//上传文件
     case -1:emit shownofile();break;
     case -2:emit showpasvfailed();break;
     case 1:emit showuploadsuccess();break;
+    }
 }
+
+void MainWindow::finishlink()
+{
+    newclinet.finish();
+    this->show();
 }

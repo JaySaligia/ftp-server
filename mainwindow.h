@@ -28,6 +28,8 @@ private slots:
     void on_exitButton_clicked();
 
     void upload();
+
+    void finishlink();
 private:
     Ui::MainWindow *ui;
     Dialog1 dialog1;

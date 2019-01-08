@@ -67,7 +67,7 @@ int client::linkstart(){
 
 
     }
-    return -4;
+    return -4;//其他错误
 
 }
 
@@ -84,17 +84,30 @@ int client::upload(const char *openfile){
     if (NULL == f)
     return -1;//文件不存在
 
+    //寻找相对目录
+    char *s = new char[100];
+    strcpy(s, openfile);
+    char *p;
+    char *filename;
+    const char *d = "/";
+    p = strtok(s,d);
+        while(p)
+        {
+            filename = p;
+            p=strtok(NULL,d);
+        }
+    //cout<<filename<<endl;
 
     if(!this->pasvstart())
         return -2;//被动模式开启失败
 
     ZeroMemory(sendbuf, BUFSIZE);
-    sprintf(sendbuf, "STOR %s\r\n", "poker.txt");
+    sprintf(sendbuf, "STOR %s\r\n", filename);
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     ZeroMemory(databuf, BUFSIZE);
     while ((len = fread(databuf, 1, BUFSIZE, f)) > 0)
     {
-        cout<<databuf<<endl;
+        //cout<<databuf<<endl;
         send_len = send(hostsocpasv, databuf, len, 0);
         if(send_len != len)
         {
@@ -108,28 +121,21 @@ int client::upload(const char *openfile){
     fclose(f);
     ZeroMemory(recvbuf, BUFSIZE);
     len = recv(hostsoc, recvbuf, BUFSIZE, 0);
-    cout<<recvbuf<<endl;
+    //cout<<recvbuf<<endl;
     recvbuf[len] = 0;
     sscanf(recvbuf, "%d", &result);
     if(result == 150)
     {
         closesocket(hostsoc);
-        WSACleanup();
-        return 1;
+        return 1;//上传成功
     }
     return -3;
 
-
-
-    //closesocket(hostsocpasv);
-    //closesocket(hostsoc);
-    //WSACleanup();
 }
 
 int client::pasvstart(){//开启pasv套接字
     char sendbuf[BUFSIZE];
     char recvbuf[BUFSIZE];
-    char buf[BUFSIZE];
     int addr[6];
     int retval;
     int serverlen;
@@ -150,5 +156,10 @@ int client::pasvstart(){//开启pasv套接字
     if (retval == SOCKET_ERROR)
         return 0;
     return 1;
+}
+
+void client::finish(){
+    closesocket(hostsoc);
+    WSACleanup();
 }
 
