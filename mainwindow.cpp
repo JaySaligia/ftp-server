@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -15,10 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::showuploadsuccess, &dialog1.dialogupload, &Dialogupload::showuploadsuccessmsg);//发送文件上传成功的信号
 
     connect(&dialog1.dialogdownload,&Dialogdownload::getdownloadmsg, this, &MainWindow::download);
+    connect(&dialog1.dialogdownload,&Dialogdownload::getstopdownloadmsg, this, &MainWindow::stopdownload);
     connect(this, &MainWindow::shownodir, &dialog1.dialogdownload, &Dialogdownload::shownodirmsg);
     connect(this, &MainWindow::shownodownloadfile, &dialog1.dialogdownload, &Dialogdownload::shownodownloadfilemsg);
     connect(this, &MainWindow::showpasvfailed, &dialog1.dialogdownload, &Dialogdownload::showpasvfailedmsg);
     connect(this, &MainWindow::showdownloadsuccess, &dialog1.dialogdownload, &Dialogdownload::showdownloadsuccessmsg);
+    connect(this, &MainWindow::showstopdownload, &dialog1.dialogdownload, &Dialogdownload::showstopdownloadmsg);
 }
 
 MainWindow::~MainWindow()
@@ -30,9 +31,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_linkButton_clicked()
 {
-    newclinet.ipaddr = ui->ipline->text().toStdString();
-    newclinet.name = ui->nameline->text().toStdString();
-    newclinet.pw = ui->pwline->text().toStdString();
+    //newclinet.ipaddr = ui->ipline->text().toStdString();
+    //newclinet.name = ui->nameline->text().toStdString();
+    //newclinet.pw = ui->pwline->text().toStdString();
+    //测试
+    newclinet.ipaddr = "39.108.177.5";
+    newclinet.name = "root";
+    newclinet.pw = "Nexbyszmdsxqpl0";
     switch (newclinet.linkstart()) {
     case -1: QMessageBox::information(this,"连接信息","初始化失败");break;
     case -2: QMessageBox::information(this,"连接信息","套接字生成失败");break;
@@ -68,12 +73,19 @@ void MainWindow::download()//下载文件
 {
     const char *storedir = dialog1.dialogdownload.storeDir.toStdString().c_str();
     const char *downloadfile = dialog1.dialogdownload.downloadFile.toStdString().c_str();
+
     switch(newclinet.download(storedir, downloadfile)){
     case -1:emit shownodir();break;
     case -2:emit shownodownloadfile();break;
     case -3:emit showpasvfailed();break;
     case 1:emit showdownloadsuccess();break;
     }
+}
+
+void MainWindow::stopdownload()
+{
+    newclinet.finish();
+    emit showstopdownload();
 }
 
 void MainWindow::finishlink()

@@ -36,6 +36,11 @@ void Dialogdownload::on_downloadstartButton_clicked()
     emit getdownloadmsg();
 }
 
+void Dialogdownload::on_downloadstopButton_clicked()
+{
+    emit getstopdownloadmsg();
+}
+
 void Dialogdownload::shownodirmsg()
 {
     QMessageBox::information(this,"错误信息","未指定文件保存目录或目录不存在");
@@ -54,4 +59,9 @@ void Dialogdownload::showpasvfailedmsg()
 void Dialogdownload::showdownloadsuccessmsg()
 {
     QMessageBox::information(this,"信息","下载成功");
+}
+
+void Dialogdownload::showstopdownloadmsg()
+{
+    QMessageBox::information(this,"信息","下载已暂停");
 }

@@ -107,6 +107,19 @@
     <string>开始下载</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="downloadstopButton">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>260</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>暂停下载</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

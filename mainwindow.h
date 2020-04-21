@@ -24,7 +24,7 @@ signals:
     void shownodir();//显示目录存在
     void shownodownloadfile();//显示未指定下载文件
     void showdownloadsuccess();//显示下载成功
-
+    void showstopdownload();//暂停下载
 private slots:
 
     void on_linkButton_clicked();
@@ -35,6 +35,7 @@ private slots:
 
     void download();
     void finishlink();
+    void stopdownload();
 private:
     Ui::MainWindow *ui;
     Dialog1 dialog1;

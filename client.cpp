@@ -34,33 +34,30 @@ int client::linkstart(){
     else{//验证用户名和密码
         string retval_name = "";
         string retval_pw = "";
-        recv(hostsoc, revbuf, sizeof(revbuf), 0);
-        //cout<<revbuf<<endl;//220 信息
+        recv(hostsoc, revbuf, sizeof(revbuf), 0);//220状态字
         ZeroMemory(revbuf, BUFSIZE);
 
         sprintf(sendbuf, "USER %s\r\n", name.c_str());
-        //cout<<sendbuf<<endl;
+
         send(hostsoc, sendbuf, strlen(sendbuf), 0);//不能用sizeof()，要用strlen()
-        recv(hostsoc, revbuf, sizeof(revbuf), 0);//331
+        recv(hostsoc, revbuf, sizeof(revbuf), 0);//331状态字
         for (int i = 0; i< 3; i++)
             retval_name += revbuf[i];
-        //cout<<retval_name<<endl;
+
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
         sprintf(sendbuf, "PASS %s\r\n", pw.c_str());
-        //cout<<sendbuf<<endl;
+
         send(hostsoc, sendbuf, strlen(sendbuf), 0);
         recv(hostsoc, revbuf, sizeof(revbuf), 0);//230
         for (int i = 0; i< 3; i++)
             retval_pw += revbuf[i];
-        //cout<<retval_pw<<endl;
+
         ZeroMemory(sendbuf, BUFSIZE);
         ZeroMemory(revbuf, BUFSIZE);
 
         if(retval_name == "331" && retval_pw == "230"){
-            //closesocket(hostsoc);
-            //WSACleanup();
             return 1;
         }
         else return -3;//用户名密码错误
@@ -145,7 +142,7 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
 
 
 
-    sprintf(sendbuf, "TYPE I\r\n");
+    sprintf(sendbuf, "TYPE I\r\n");//指定传输模式
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
 
@@ -160,20 +157,45 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
     sscanf(recvbuf, "%d", &result);
     if(result != 150)
         return -2;//文件不存在
-    FILE *f = fopen(filename, "wb");
+    FILE *f = fopen(filename, "ab");
     if(f == NULL)
     {
         return -1;
     }
     ZeroMemory(databuf, sizeof(databuf));
+    //判断有无断点
+
+    FILE *f_b = fopen(filename, "r");
+    int filesize = 0;
+    int chunk = 0;
+    int appendix = 0;
+    if(f_b)//有断点
+    {
+        fseek(f_b, 0, SEEK_END);   ///将文件指针移动文件结尾
+        filesize = ftell(f_b);
+        chunk = filesize / BUFSIZE;
+        appendix = filesize - chunk * BUFSIZE;
+    }
+    fclose(f_b);
+    int count = 0;
+    while(count < chunk){
+        recv(hostsocpasv, databuf, BUFSIZE, 0);
+        count ++;
+    }
+    char appendixbuf[appendix];
+    ZeroMemory(appendixbuf, sizeof(appendixbuf));
+    recv(hostsocpasv, appendixbuf, appendix, 0);
+    printf("filesize:%d\n", filesize);
+    fseek(f, (long)filesize, SEEK_SET);
     while ((len = recv(hostsocpasv, databuf, BUFSIZE, 0)) > 0) {
-            write_len = fwrite(&databuf, len, 1, f);
-            if (write_len != 1) //写入文件不完整
-            {
-                closesocket(hostsocpasv); //关闭套接字
-                fclose(f); //关闭文件
-                return -1;
-            }
+                printf("len:%d\n", len);
+                write_len = fwrite(&databuf, len, 1, f);
+                if (write_len != 1) //写入文件不完整
+                {
+                    closesocket(hostsocpasv); //关闭套接字
+                    fclose(f); //关闭文件
+                    return -1;
+                }
         }
 
     fclose(f);
