@@ -18,11 +18,11 @@ public:
     void shownofilemsg();
     void showpasvfailedmsg();
     void showuploadsuccessmsg();
-
+    void showstopuploadmsg();
 signals:
     void showdialog1up();
     void getfilename();
-
+    void getstopuploadmsg();
 
 private slots:
     void on_backButton_clicked();
@@ -30,6 +30,8 @@ private slots:
     void on_csfileButton_clicked();
 
     void on_uploadstartButton_clicked();
+
+    void on_uploadstopButton_clicked();
 
 private:
     Ui::Dialogupload *ui;

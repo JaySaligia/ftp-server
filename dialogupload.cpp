@@ -45,5 +45,16 @@ void Dialogupload::showuploadsuccessmsg()
 
 void Dialogupload::on_uploadstartButton_clicked()
 {
+    QMessageBox::information(this,"信息","开始上传");
     emit getfilename();
+}
+
+void Dialogupload::on_uploadstopButton_clicked()
+{
+    emit getstopuploadmsg();
+}
+
+void Dialogupload::showstopuploadmsg()
+{
+    QMessageBox::information(this,"信息","上传已暂停");
 }

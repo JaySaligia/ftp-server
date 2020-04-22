@@ -4,6 +4,7 @@
 #include <iostream>
 #include "string.h"
 #include "dialogupload.h"
+#include "QApplication.h"
 
 using namespace std;
 

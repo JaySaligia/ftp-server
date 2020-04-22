@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>180</y>
+     <y>220</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -82,6 +82,19 @@
    </property>
    <property name="text">
     <string>开始上传</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="uploadstopButton">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>170</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>暂停上传</string>
    </property>
   </widget>
  </widget>

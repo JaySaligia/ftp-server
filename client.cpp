@@ -93,14 +93,35 @@ int client::upload(const char *openfile){
             filename = p;
             p=strtok(NULL,d);
         }
-    SOCKET hostsocpasv = pasvstart();
-    //if(!this->pasvstart())
-      //  return -2;//被动模式开启失败
 
+    sprintf(sendbuf, "TYPE I\r\n");//指定传输模式
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    SOCKET hostsocpasv = pasvstart();
+    //查看是否有断点，并记录下文件大小
+    sprintf(sendbuf, "RETR %s\r\n", filename);
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    recvbuf[len] = 0;
+    sscanf(recvbuf, "%d", &result);
+    int filesize = 0;
+    printf("result:%d\n",result);
+    if(result == 150)
+    {
+    ZeroMemory(databuf, sizeof(databuf));
+    while ((len = recv(hostsocpasv, databuf, BUFSIZE, 0)) > 0) {
+                filesize+=len;
+                QApplication::processEvents();
+        }
+    }
+    closesocket(hostsocpasv);
+    hostsocpasv = pasvstart();
+    //开始上传文件
     ZeroMemory(sendbuf, BUFSIZE);
-    sprintf(sendbuf, "STOR %s\r\n", filename);
+    sprintf(sendbuf, "APPE %s\r\n", filename);
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     ZeroMemory(databuf, BUFSIZE);
+    fseek(f, (long)filesize, SEEK_SET);
     while ((len = fread(databuf, 1, BUFSIZE, f)) > 0)
     {
         send_len = send(hostsocpasv, databuf, len, 0);
@@ -110,7 +131,7 @@ int client::upload(const char *openfile){
             fclose(f);
             return -3;//发送文件失败
         }
-
+        QApplication::processEvents();
     }
     closesocket(hostsocpasv);
     fclose(f);
@@ -150,6 +171,20 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
 
     ZeroMemory(sendbuf, sizeof(sendbuf));
     ZeroMemory(recvbuf, sizeof(recvbuf));
+    FILE *f_b = fopen(filename, "r");
+    //寻找文件，如果已经有同名文件，查看是否未传输完成
+    int filesize = 0;
+    if(f_b)//有断点
+    {
+        fseek(f_b, 0, SEEK_END);   //将文件指针移动文件结尾
+        filesize = ftell(f_b);
+    }
+    fclose(f_b);
+    //发送断点续传请求
+    sprintf(sendbuf,"REST %d\r\n", filesize);
+    send(hostsoc, sendbuf, strlen(sendbuf), 0);
+    len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
+    //发送
     sprintf(sendbuf, "RETR %s\r\n", downloadfile);
     send(hostsoc, sendbuf, strlen(sendbuf), 0);
     len = recv(hostsoc, recvbuf, sizeof(recvbuf), 0);
@@ -163,32 +198,8 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
         return -1;
     }
     ZeroMemory(databuf, sizeof(databuf));
-    //判断有无断点
-
-    FILE *f_b = fopen(filename, "r");
-    int filesize = 0;
-    int chunk = 0;
-    int appendix = 0;
-    if(f_b)//有断点
-    {
-        fseek(f_b, 0, SEEK_END);   ///将文件指针移动文件结尾
-        filesize = ftell(f_b);
-        chunk = filesize / BUFSIZE;
-        appendix = filesize - chunk * BUFSIZE;
-    }
-    fclose(f_b);
-    int count = 0;
-    while(count < chunk){
-        recv(hostsocpasv, databuf, BUFSIZE, 0);
-        count ++;
-    }
-    char appendixbuf[appendix];
-    ZeroMemory(appendixbuf, sizeof(appendixbuf));
-    recv(hostsocpasv, appendixbuf, appendix, 0);
-    printf("filesize:%d\n", filesize);
     fseek(f, (long)filesize, SEEK_SET);
     while ((len = recv(hostsocpasv, databuf, BUFSIZE, 0)) > 0) {
-                printf("len:%d\n", len);
                 write_len = fwrite(&databuf, len, 1, f);
                 if (write_len != 1) //写入文件不完整
                 {
@@ -196,6 +207,7 @@ int client::download(const char *storedir,const char *downloadfile){//下载文�
                     fclose(f); //关闭文件
                     return -1;
                 }
+                QApplication::processEvents();
         }
 
     fclose(f);

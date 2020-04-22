@@ -33,6 +33,7 @@ void Dialogdownload::on_stfileButton_clicked()
 void Dialogdownload::on_downloadstartButton_clicked()
 {
     downloadFile = ui->downloadfileLine->text();
+    QMessageBox::information(this,"信息","开始下载");
     emit getdownloadmsg();
 }
 
